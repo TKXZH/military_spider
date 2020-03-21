@@ -14,7 +14,10 @@ class ProjectPipeline(object):
 
 class MilitaryImagePipeline(ImagesPipeline):
     def item_completed(self, results, item, info):
-        image_paths = [x['path'] for ok, x in results if ok and len(results) > 0]
-        if image_paths:
-            item['image_paths'] = ','.join(image_paths)
+        if len(results) > 0:
+            image_paths = [x['path'] for ok, x in results if ok]
+            if image_paths:
+                item['image_paths'] = ','.join(image_paths)
+                return item
+        else:
             return item
