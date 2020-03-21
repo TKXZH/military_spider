@@ -31,7 +31,6 @@ class Military(scrapy.Spider):
         super(Military, self).__init__(*args, **kwargs)
 
     def parse(self, response):
-        a = self.settings
         urls = response.xpath("(//div[@class='contentStripInner'])[4]//a/@href")
         for url in urls:
             yield response.follow(url, self.handle_list)
@@ -45,8 +44,9 @@ class Military(scrapy.Spider):
         detail = {
             "url": response.request.url,
             "name": response.xpath("//h1/text()").get(),
-            "detail": '\n'.join(response.xpath("//span[@class='textLarge textDkGray']/text()").getall()),
+            "detail": '\n'.join(response.xpath("//span[@class='textLarge textDkGray']//text()").getall()),
             "desc": response.xpath("(//span[@class='textLarge textWhite'])[1]/text()").get(),
+            "program_updates": ''.join(response.xpath("//h2[text()='Program Updates']/parent::span/text()").getall()),
             "image_urls": list(map(response.urljoin, response.xpath("//img[contains(@data-u,'image')]/@src").getall()))
         }
         buttons = response.xpath("(//button[@class='collapsible'])")
@@ -54,7 +54,7 @@ class Military(scrapy.Spider):
             button_name = button.xpath("text()").get()
             names = button.xpath(
                 "following-sibling::div[1]//span[@class='textLarge textYellow textBold']/text()").getall()
-            values = button.xpath("following-sibling::div[1]//span[@class='textLarge textWhite']/text()").getall()
+            values = button.xpath("following-sibling::div[1]//span[@class='textLarge textWhite']//text()").getall()
             if len(names) != 0:
                 detail.update(dict(zip(names, values)))
             else:
