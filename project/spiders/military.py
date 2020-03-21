@@ -3,10 +3,7 @@ import re
 
 
 class Military(scrapy.Spider):
-
-    def __init__(self, category=None, *args, **kwargs):
-        super(Military, self).__init__(*args, **kwargs)
-        self.start_urls = ['https://www.militaryfactory.com/%s/indexMAIN.asp' % category]
+    start_urls = ['https://www.militaryfactory.com/smallarms/guns-by-country.asp']
 
     custom_settings = {
         "FEED_URI": 'exported_data/%(name)s/%(time)s.csv',
@@ -20,7 +17,7 @@ class Military(scrapy.Spider):
             yield response.follow(url, self.handle_list)
 
     def handle_list(self, response):
-        items = response.xpath("/html/body/div[11]/div/div/a/@href")
+        items = response.xpath("//div[@class='box']//a/@href")
         for item in items:
             yield response.follow(item, self.extract_detail)
 
@@ -43,8 +40,3 @@ class Military(scrapy.Spider):
             "rate_od_fire": response.xpath("(//span[@class='textLarge textWhite'])[12]/text()").get(),
         }
         yield {k: v.strip() if type(v) is str else v for k, v in detail.items()}
-
-    def remove_invisible_char(self, old_str):
-        if old_str is None:
-            return ''
-        return re.sub('\W+', ' ', old_str).strip()
