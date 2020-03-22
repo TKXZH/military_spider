@@ -15,7 +15,10 @@ class Military(scrapy.Spider):
         "FEED_FORMAT": 'csv',
         "FEED_URI": "data/%(bjtime)s/%(category)s/data.csv",
         "ITEM_PIPELINES": {'project.pipelines.MilitaryImagePipeline': 1},
-        "IMAGES_STORE": "data/images"
+        "IMAGES_STORE": "data/images",
+        "FEED_EXPORTERS": {
+            'csv': 'project.exporters.QuoteAllCsvItemExporter',
+        }
     }
 
     def __init__(self, category=None, *args, **kwargs):
